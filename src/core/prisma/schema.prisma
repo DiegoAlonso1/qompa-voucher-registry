@@ -5,18 +5,23 @@ generator client {
 
 datasource db {
   provider = "postgresql"
-  url      = "postgresql://krb9a:shadow-d18eqm4lukt42q46h71g@127.0.0.1:9500/encore_prisma_test?sslmode=disable"
+  url      = "postgresql://krb9a:shadow-d18eqm4lukt42q46h71g@127.0.0.1:9500/voucher_registry?sslmode=disable"
 }
 
-
+enum VoucherStatus {
+  PENDING
+  VALIDATED
+  REJECTED
+  OBSERVED
+}
 
 model Voucher {
     id Int      @id @default(autoincrement())
-    name String
-    description String
-    discount Int
-    validFrom DateTime
-    validTo DateTime
-    code String
-    isActive Boolean @default(true)
+    company_id String
+    supplier_ruc String
+    invoice_number String
+    amount Float
+    issue_date DateTime
+    document_type String
+    status VoucherStatus @default(PENDING)
 }

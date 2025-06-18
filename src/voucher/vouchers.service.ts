@@ -1,6 +1,7 @@
-import { PrismaClient, Voucher } from "@prisma/client";
-import { CreateVoucherDto } from "./dto/create-voucher.dto";
+import { PrismaClient, VoucherStatus } from "@prisma/client";
 import { Inject, Injectable, NotFoundException } from "@nestjs/common";
+import { SaveVoucherResource } from "./resources/save-voucher.resource";
+import { VoucherResource, mapVoucherToResource } from "./resources/voucher.resource";
 
 @Injectable()
 export class VouchersService {
@@ -8,24 +9,66 @@ export class VouchersService {
     @Inject('VOUCHER_MODEL') private readonly db: () => PrismaClient['voucher'],
   ) {}
 
-  async create(createVoucherDto: CreateVoucherDto): Promise<void> {
-    await this.db().create({
+  async create(createVoucherDto: SaveVoucherResource): Promise<VoucherResource> {
+    const voucher = await this.db().create({
       data: createVoucherDto
     });
-    return;
+
+    return mapVoucherToResource(voucher);
   }
 
-  async get(id: number): Promise<Voucher> {
+  async get(id: number): Promise<VoucherResource> {
     const voucher = await this.db().findUnique({
       where: { id },
     });
     if (!voucher) {
       throw new NotFoundException(`Voucher with ID ${id} not found`);
     }
-    return voucher;
+    
+    return mapVoucherToResource(voucher);
   }
 
-  async findAll(): Promise<Voucher[]> {
-    return await this.db().findMany();
+  async findAll(): Promise<VoucherResource[]> {
+    const vouchers = await this.db().findMany();
+    return vouchers.map(voucher => mapVoucherToResource(voucher) );
+  }
+
+  async sendToSunat(id: number): Promise<VoucherResource> {
+    const voucher = await this.db().findUnique({
+      where: { id },
+    });
+    if (!voucher) {
+      throw new NotFoundException(`Voucher with ID ${id} not found`);
+    }
+    
+    // Simulate sending to SUNAT by updating the status
+    const allStatuses = Object.values(VoucherStatus);
+
+    // Get random status excluding PENDING
+    const eligibleStatuses = allStatuses.filter(status => status !== VoucherStatus.PENDING);
+    const randomIndex = Math.floor(Math.random() * eligibleStatuses.length);
+    const randomStatus = eligibleStatuses[randomIndex];
+    
+    const updatedVoucher = await this.db().update({
+      where: { id },
+      data: { status: randomStatus },
+    });
+    return mapVoucherToResource(updatedVoucher);
+  }
+
+  
+
+  async downloadAllAsCsv(): Promise<string> {
+    const vouchers = await this.findAll();
+    if (vouchers.length === 0) {
+      return '';
+    }
+
+    const header = 'ID,Company ID,Supplier RUC,Invoice Number,Amount,Issue Date,Document Type,IGV,Total,Status\n';
+    const rows = vouchers.map(voucher => 
+      `${voucher.id},${voucher.company_id},${voucher.supplier_ruc},${voucher.invoice_number},${voucher.amount},${voucher.issue_date.toISOString()},${voucher.document_type},${voucher.igv},${voucher.total},${voucher.status}`
+    ).join('\n');
+
+    return header + rows;
   }
 }
