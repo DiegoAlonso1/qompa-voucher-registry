@@ -22,7 +22,7 @@ export const get = api(
 
 // Endpoint requires authentication, auth handler will be called before the endpoint.
 export const create = api(
-  { expose: true, auth: true, method: 'POST', path: '/cats' },
+  { expose: true, method: 'POST', path: '/cats' },
   async (dto: CreateCatDto): Promise<void> => {
     // Inside the endpoint we can use the `applicationContext` to get the services we need.
     const { catsService } = await applicationContext;

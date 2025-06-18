@@ -1,0 +1,22 @@
+generator client {
+  provider = "prisma-client-js"
+  binaryTargets = ["native", "debian-openssl-3.0.x"]
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = "postgresql://krb9a:shadow-d18eqm4lukt42q46h71g@127.0.0.1:9500/encore_prisma_test?sslmode=disable"
+}
+
+
+
+model Voucher {
+    id Int      @id @default(autoincrement())
+    name String
+    description String
+    discount Int
+    validFrom DateTime
+    validTo DateTime
+    code String
+    isActive Boolean @default(true)
+}
