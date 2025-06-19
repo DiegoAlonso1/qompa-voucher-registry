@@ -5,6 +5,9 @@
   "description": "NestJS + Encore Example",
   "license": "MPL-2.0",
   "type": "module",
+  "prisma": {
+    "seed": "tsx src/core/prisma/seed.ts"
+  },
   "dependencies": {
     "@nestjs/common": "^10.0.0",
     "@nestjs/config": "^4.0.2",
@@ -12,7 +15,6 @@
     "@nestjs/platform-express": "^10.0.0",
     "@prisma/client": "^6.10.0",
     "encore.dev": "^1.48.4",
-    "knex": "^3.1.0",
     "openai": "^5.5.1",
     "pg": "^8.12.0",
     "reflect-metadata": "^0.2.0",
@@ -23,7 +25,7 @@
     "@nestjs/cli": "^10.0.0",
     "@nestjs/schematics": "^10.0.0",
     "@types/express": "^4.17.17",
-    "@types/node": "^20.3.1",
+    "@types/node": "^20.19.1",
     "@typescript-eslint/eslint-plugin": "^6.0.0",
     "@typescript-eslint/parser": "^6.0.0",
     "encore.dev": "^1.48.4",
@@ -32,6 +34,7 @@
     "eslint-plugin-import": "2.29.1",
     "eslint-plugin-prettier": "^5.0.0",
     "prisma": "^6.10.0",
+    "tsx": "^4.20.3",
     "typescript": "^5.1.3"
   }
 }
